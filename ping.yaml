@@ -1,0 +1,5 @@
+- name: ping of master nodes
+  hosts: all
+  tasks:
+    - name: ping
+      ping:

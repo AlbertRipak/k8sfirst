@@ -1,0 +1,46 @@
+---
+- name: 
+- name: Installation all packages
+  yum: 
+    name: "{{ item }}"
+  with_items:
+    - bash-completion
+    - python3 
+    - tar
+    - containerd
+    - nfs-utils
+    - chrony
+    - kubectl 
+    - kubelet
+    - kubeadm
+    - mc
+    - vim
+    - git 
+    - rsyslog
+    - jq
+    - zip
+    - unzip
+
+- ansible.posix.sysctl:
+  when: inventory_hostname in groups ['k8smaster']
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  with_items:
+    - name: net.ipv4.ip_forward
+      value: '1'
+    - name: net.bridge.bridge-nf-call-iptables
+      value: '1'
+    - name: net.bridge.bridge-nf-call-ip6tables
+      value: '1'
+
+- ansible.posix.sysctl: 
+  when: inventory_hostname in groups ['k8sworker']
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  with_items:
+  - name: net.ipv4.ip_nonlocal_bind
+    value: '1'
