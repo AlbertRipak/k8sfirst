@@ -1,1 +1,11 @@
-host: master01
+---
+- hosts: master01
+  become: yes
+  tasks: 
+  - name: remove package
+    ansible.builtin.yum:
+      name: "{{ name.item }}"
+      state: absent
+      with_items: 
+        name: cowsay
+        name: mc

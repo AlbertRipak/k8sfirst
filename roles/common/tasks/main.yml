@@ -1,5 +1,4 @@
 ---
-- name: 
 - name: Installation all packages
   yum: 
     name: "{{ item }}"
@@ -20,6 +19,12 @@
     - jq
     - zip
     - unzip
+
+- name: firewalld disabled
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
 
 - ansible.posix.sysctl:
   when: inventory_hostname in groups ['k8smaster']
@@ -44,3 +49,30 @@
   with_items:
   - name: net.ipv4.ip_nonlocal_bind
     value: '1'
+---
+- name: add repository
+  ansible.builtin.yum_repository:
+    name: docker-ce
+    description: Docker CE Nightly - Sources
+    file: docker-ce
+    baseurl: https://download.docker.com/linux/centos/$releasever/source/nightly
+    enabled: False
+    gpgcheck: True
+    gpgkey: https://download.docker.com/linux/centos/gpg
+
+- name: Remove the docker packages
+  ansible.builtin.yum: 
+    name: "{{ name.item }}"
+    state: absent
+    with_items:
+      name: cowsay
+
+      - ansible.posix.sysctl:
+  when: inventory_hostname in groups ['k8smaster']
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  with_items:
+    - name: net.ipv4.ip_forward
+      value: '1'

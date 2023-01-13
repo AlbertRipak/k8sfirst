@@ -1,5 +1,4 @@
 ---
-host: k8sall
+hosts: k8sall
 roles:
   common:
-  
